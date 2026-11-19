@@ -17,6 +17,9 @@ volatile int mouse_click_x;
 volatile int mouse_click_y;
 volatile int mouse_right_x;
 volatile int mouse_right_y;
+int mouse_speed = 3;
+int mouse_cursor_scale = 1;
+int mouse_invert_y;
 
 static uint8_t packet[3];
 static int packet_index;
@@ -123,7 +126,25 @@ void mouse_irq(void)
     if (packet[0] & 0x20)
         dy -= 256;
     dy = -dy;
+    if (mouse_invert_y)
+        dy = -dy;
     buttons = (uint8_t)(packet[0] & 0x07);
+
+    {
+        static int acc_x;
+        static int acc_y;
+        int scaled_x;
+        int scaled_y;
+
+        acc_x += dx * mouse_speed;
+        acc_y += dy * mouse_speed;
+        scaled_x = acc_x / 3;
+        scaled_y = acc_y / 3;
+        acc_x -= scaled_x * 3;
+        acc_y -= scaled_y * 3;
+        dx = scaled_x;
+        dy = scaled_y;
+    }
 
     mouse_x += dx;
     mouse_y += dy;
@@ -131,10 +152,14 @@ void mouse_irq(void)
         mouse_x = 0;
     if (mouse_y < 0)
         mouse_y = 0;
-    if (mouse_x > gfx_width - 1)
-        mouse_x = gfx_width - 1;
-    if (mouse_y > gfx_height - 1)
-        mouse_y = gfx_height - 1;
+    if (mouse_x > gfx_width - 12 * mouse_cursor_scale)
+        mouse_x = gfx_width - 12 * mouse_cursor_scale;
+    if (mouse_y > gfx_height - 12 * mouse_cursor_scale)
+        mouse_y = gfx_height - 12 * mouse_cursor_scale;
+    if (mouse_x < 0)
+        mouse_x = 0;
+    if (mouse_y < 0)
+        mouse_y = 0;
 
     if ((buttons & 1) && !(previous_buttons & 1)) {
         mouse_clicked = 1;

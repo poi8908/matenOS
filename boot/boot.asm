@@ -90,7 +90,7 @@ start:
     pop     es
     pop     ds
 
-    ; Bochs/QEMU VBE: 640x480x32 linear framebuffer at 0xFD000000.
+    ; Bochs/QEMU VBE: 1280x1024x32 linear framebuffer at 0xFD000000.
     mov     dx, 0x1CE
     mov     ax, 0x0004
     out     dx, ax
@@ -205,4 +205,7 @@ gdt_desc:
 
 times 510 - ($ - $$) db 0
 dw 0xAA55
+
+
+
 

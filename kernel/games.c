@@ -2,6 +2,7 @@
 #include "gfx.h"
 #include "string.h"
 #include "timer.h"
+#include "zh.h"
 
 #define C_TEXT  0x00141C24
 #define C_MUTED 0x00607080
@@ -151,17 +152,35 @@ void mines_draw(int x, int y, int w, int h)
 
     mines_grid_origin(x, y, w, h, &gx, &gy);
 
-    strcpy(text, mines_dead ? "BOOM!  click Reset" : (mines_won ? "You win!  click Reset" : "Mines 12   flags "));
-    if (!mines_dead && !mines_won) {
-        char number[4];
-        int n = mines_flags;
-        int i = 0;
-        if (n == 0) number[i++] = '0';
-        while (n > 0) { number[i++] = (char)('0' + n % 10); n /= 10; }
-        while (i > 0) text[strlen(text)] = number[--i];
-        text[strlen(text)] = 0;
+    if (zh_language) {
+        if (mines_dead)
+            strcpy(text, "失败 点击重置");
+        else if (mines_won)
+            strcpy(text, "胜利 点击重置");
+        else {
+            strcpy(text, "雷 12  旗 ");
+            char number[4];
+            int n = mines_flags;
+            int i = 0;
+            if (n == 0) number[i++] = '0';
+            while (n > 0) { number[i++] = (char)('0' + n % 10); n /= 10; }
+            while (i > 0) text[strlen(text)] = number[--i];
+            text[strlen(text)] = 0;
+        }
+        zh_text(x + 6, y + 6, text, mines_dead ? C_RED : C_TEXT, 1);
+    } else {
+        strcpy(text, mines_dead ? "BOOM!  click Reset" : (mines_won ? "You win!  click Reset" : "Mines 12   flags "));
+        if (!mines_dead && !mines_won) {
+            char number[4];
+            int n = mines_flags;
+            int i = 0;
+            if (n == 0) number[i++] = '0';
+            while (n > 0) { number[i++] = (char)('0' + n % 10); n /= 10; }
+            while (i > 0) text[strlen(text)] = number[--i];
+            text[strlen(text)] = 0;
+        }
+        gfx_text(x + 6, y + 6, text, mines_dead ? C_RED : C_TEXT, 1);
     }
-    gfx_text(x + 6, y + 6, text, mines_dead ? C_RED : C_TEXT, 1);
 
     gfx_fill(x + w - 92, y + 4, 86, 24, C_BLUE);
     gfx_text(x + w - 78, y + 10, "Reset", C_WHITE, 1);
@@ -359,7 +378,10 @@ void snake_draw(int x, int y, int w, int h)
         text[strlen(text)] = 0;
     }
     gfx_text(x + 6, y + 6, text, C_TEXT, 1);
-    gfx_text(x + 140, y + 6, "WASD to move, R reset", C_MUTED, 1);
+    if (zh_language)
+        zh_text(x + 140, y + 6, "WASD 移动, R 重置", C_MUTED, 1);
+    else
+        gfx_text(x + 140, y + 6, "WASD to move, R reset", C_MUTED, 1);
 
     gfx_fill(gx, gy, SNAKE_W * SNAKE_CELL, SNAKE_H * SNAKE_CELL, C_DARK);
     for (i = 0; i < snake_len; i++) {

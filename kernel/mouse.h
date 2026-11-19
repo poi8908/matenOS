@@ -14,6 +14,9 @@ extern volatile int mouse_click_x;
 extern volatile int mouse_click_y;
 extern volatile int mouse_right_x;
 extern volatile int mouse_right_y;
+extern int mouse_speed;
+extern int mouse_cursor_scale;
+extern int mouse_invert_y;
 
 void mouse_init(void);
 void mouse_irq(void);

@@ -19,7 +19,7 @@ if not defined QEMU for /f "delims=" %%Q in ('where qemu-system-i386w 2^>nul') d
 if not defined QEMU goto :no_qemu
 
 echo [2/2] starting...
-start "matenOS" "%QEMU%" -name matenOS -m 32 -boot a -vga std -full-screen -fda "%~dp0build\matenos.img" -serial "file:%~dp0build\serial.log"
+start "matenOS" "%QEMU%" -name matenOS -m 32 -boot a -vga std -display gtk,grab-on-hover=on -full-screen -fda "%~dp0build\matenos.img" -serial "file:%~dp0build\serial.log"
 exit /b 0
 
 :no_qemu
